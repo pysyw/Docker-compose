@@ -1,0 +1,18 @@
+version: "3.2"
+services:
+  rabbitmq:
+    image: cloudamqp/lavinmq
+    container_name: 'lavinmq'
+    # restart: always
+    ports:
+        - "15672:15672"
+        - "5672:5672"
+    volumes:
+        - ./data/:/var/lib/lavinmq/
+        - ./log/:/var/log/lavinmq
+    networks:
+        - lavinmq_go_net
+
+networks:
+  lavinmq_go_net:
+    driver: bridge
