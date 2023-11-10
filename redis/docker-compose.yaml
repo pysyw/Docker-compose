@@ -5,7 +5,5 @@ services:    #服务根节点
       container_name: redis                     #设置容器名称
       command: redis-server --appendonly yes --requirepass '123456'    #开启持久化的支持并设置认证密码
       restart: always                           #跟随docker的启动而启动
-      volumes:
-        - /mydata/redis/data:/data              #数据文件挂载
       ports:
         - 6379:6379
