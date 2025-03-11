@@ -1,16 +1,42 @@
-version: '3'
+version: '3.8'
+
 services:
-  consul:
+  consul-server:
     image: consul:1.15.4
-    restart: always
-    container_name: consul_server
-    network_mode: bridge 
-    volumes: 
-      - ./consul:/tmp/consul
+    container_name: consul-server
+    hostname: consul-server
     ports:
-      - 8300:8300
-      - 8301:8301
-      - 8302:8302
-      - 8400:8400
-      - 8500:8500
-    command: consul agent -data-dir=/tmp/consul -dev -client=0.0.0.0
+      - "8500:8500"  # Consul Web UI
+      - "8600:8600"  # DNS
+      - "8300:8300"  # Server RPC
+      - "8301:8301"  # Serf LAN
+      - "8302:8302"  # Serf WAN
+    volumes:
+      - ./consul/data:/consul/data  # 持久化数据目录
+      - ./consul/config:/consul/config  # 配置文件目录
+    environment:
+      - CONSUL_LOCAL_CONFIG={"datacenter":"dc1", "server":true, "bootstrap_expect":1}
+    command: >
+      agent -server -bind=0.0.0.0 -client=0.0.0.0 -ui -data-dir=/consul/data -config-dir=/consul/config
+    networks:
+      - consul-net
+
+  consul-client:
+    image: consul:1.15.4
+    container_name: consul-client
+    hostname: consul-client
+    depends_on:
+      - consul-server
+    volumes:
+      - ./consul/data:/consul/data  # 持久化数据目录
+      - ./consul/config:/consul/config  # 配置文件目录
+    environment:
+      - CONSUL_LOCAL_CONFIG={"datacenter":"dc1", "retry_join":["consul-server"]}
+    command: >
+      agent -bind=0.0.0.0 -client=0.0.0.0 -data-dir=/consul/data -config-dir=/consul/config
+    networks:
+      - consul-net
+
+networks:
+  consul-net:
+    driver: bridge
