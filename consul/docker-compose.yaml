@@ -4,6 +4,7 @@ services:
   consul-server:
     image: consul:1.15.4
     container_name: consul-server
+    restart: always
     hostname: consul-server
     ports:
       - "8500:8500"  # Consul Web UI
@@ -25,6 +26,7 @@ services:
     image: consul:1.15.4
     container_name: consul-client
     hostname: consul-client
+    restart: always
     depends_on:
       - consul-server
     volumes:
