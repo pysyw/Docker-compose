@@ -13,6 +13,9 @@ services:
       - discovery.type=single-node 
       #设置使用jvm内存大小
       - ES_JAVA_OPTS=-Xms512m -Xmx512m 
+    volumes:
+      - ./data:/usr/share/elasticsearch/data
+      - ./plugins:/usr/share/elasticsearch/plugins
     ports:
       - 9200:9200
       - 9300:9300
